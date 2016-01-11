@@ -23,7 +23,6 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
         self.training_data_ = self.nbrs_._fit_X
 
         # TODO: make this more efficient
-        # TODO: make duplicates behave correctly
         if self.kernel_width is None:
             W = kneighbors_graph(self.nbrs_, self.n_neighbors,
                                  mode='connectivity', include_self=True)
@@ -37,6 +36,8 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
         D = np.diag(W.sum(1))
         L = D - W
         
+        # TODO: Make this computation more stable using
+        # http://www.iipl.fudan.edu.cn/~zhangjp/literatures/MLF/TR-2002-09.pdf
         A = np.dot(X.T, np.dot(L, X))
         B = np.dot(X.T, np.dot(D, X))
         
