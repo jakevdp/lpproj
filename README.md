@@ -1,4 +1,4 @@
-# Locality Preserving Projection in Python
+# Locality Preserving Projections in Python
 
 This is a Python implementation of Locality Preserving Projections (LPP), compatible with scikit-learn.
 

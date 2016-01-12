@@ -1,0 +1,6 @@
+include *.md
+include *.py
+include *.cfg
+include Example.ipynb
+recursive-include lpproj *.py
+include LICENSE
