@@ -39,7 +39,7 @@ def test_line_plus_outlier():
 
 
 def test_weights():
-    X, y = make_blobs(100, n_features=3)
+    X, y = make_blobs(100, n_features=3, random_state=42)
 
     # with large enough weights, results should be equivalent to adjacency
     lpp1 = LocalityPreservingProjection(n_components=2, weight='adjacency')
