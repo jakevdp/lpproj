@@ -8,7 +8,29 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
     """Locality Preserving Projection
-    
+
+    Parameters
+    ----------
+    n_components : integer
+        number of coordinates for the manifold
+
+    n_neighbors : integer
+        number of neighbors to consider for each point.
+
+    kernel : string ['adjacency'|'heat']
+        Kernel to use for the mapping
+
+    kernel_width : float
+        Width of the kernel. Only referenced if kernel == 'heat'
+
+    neighbors_algorithm : string ['auto'|'brute'|'kd_tree'|'ball_tree']
+        Algorithm to use for nearest neighbors search,
+        passed to neighbors.NearestNeighbors instance.
+
+    Attributes
+    ----------
+    projection_ : array-like, shape (n_features, n_components)
+        Linear projection matrix for the embedding
     """
     def __init__(self, n_components=2, n_neighbors=5,
                  kernel='adjacency', kernel_width=1.0,
@@ -71,7 +93,7 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
             W.data = np.exp(-W.data ** 2 / self.kernel_width ** 2)
         else:
             raise ValueError("Unrecognized Kernel")
-            
+
         # symmetrize the matrix
         # TODO: make this more efficient & keep sparse output
         W = W.toarray()
