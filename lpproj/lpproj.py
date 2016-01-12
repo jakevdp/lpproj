@@ -17,11 +17,12 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
     n_neighbors : integer
         number of neighbors to consider for each point.
 
-    kernel : string ['adjacency'|'heat']
-        Kernel to use for the mapping
+    weight : string ['adjacency'|'heat']
+        Weight function to use for the mapping
 
-    kernel_width : float
-        Width of the kernel. Only referenced if kernel == 'heat'
+    weight_width : float
+        Width of the heat kernel for building the weight matrix.
+        Only referenced if weights == 'heat'
 
     neighbors_algorithm : string ['auto'|'brute'|'kd_tree'|'ball_tree']
         Algorithm to use for nearest neighbors search,
@@ -33,14 +34,14 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
         Linear projection matrix for the embedding
     """
     def __init__(self, n_components=2, n_neighbors=5,
-                 kernel='adjacency', kernel_width=1.0,
+                 weight='adjacency', weight_width=1.0,
                  neighbors_algorithm='auto'):
         # TODO: allow radius neighbors
-        # TODO: allow for precomputed kernels
+        # TODO: allow for precomputed weights
         self.n_components = n_components
         self.n_neighbors = n_neighbors
-        self.kernel = kernel
-        self.kernel_width = kernel_width
+        self.weight = weight
+        self.weight_width = weight_width
         self.neighbors_algorithm = neighbors_algorithm
 
     def fit(self, X, y=None):
@@ -84,15 +85,15 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
                                       algorithm=self.neighbors_algorithm)
         self.nbrs_.fit(X)
 
-        if self.kernel == 'adjacency':
+        if self.weight == 'adjacency':
             W = kneighbors_graph(self.nbrs_, self.n_neighbors,
                                  mode='connectivity', include_self=True)
-        elif self.kernel == 'heat':
+        elif self.weight == 'heat':
             W = kneighbors_graph(self.nbrs_, self.n_neighbors,
-                                 mode='distance')
-            W.data = np.exp(-W.data ** 2 / self.kernel_width ** 2)
+                                 mode='distance', include_self=True)
+            W.data = np.exp(-W.data ** 2 / self.weight_width ** 2)
         else:
-            raise ValueError("Unrecognized Kernel")
+            raise ValueError("Unrecognized Weight")
 
         # symmetrize the matrix
         # TODO: make this more efficient & keep sparse output

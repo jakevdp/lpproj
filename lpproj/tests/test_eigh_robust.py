@@ -77,3 +77,13 @@ def test_eigh_robust_turbo():
 
     for turbo in [True, False]:
         yield check_results, turbo
+
+def test_non_generalized():
+    rand = np.random.RandomState(42)
+    A = sym_matrix(10, rand)
+
+    evals1, evecs1 = eigh_robust(A)
+    evals2, evecs2 = linalg.eigh(A)
+
+    assert_allclose_evecs(evecs1, evecs2)
+    assert_allclose(evals1, evals2)

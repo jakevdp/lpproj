@@ -1,8 +1,14 @@
 import numpy as np
-from numpy.testing import assert_equal, assert_allclose
+from numpy.testing import assert_equal, assert_allclose, assert_raises
 from sklearn.datasets import make_blobs
 
 from .. import LocalityPreservingProjection
+
+
+def test_bad_weights():
+    lpp = LocalityPreservingProjection(weight='bad_argument')
+    assert_raises(ValueError, lpp.fit, np.zeros((10, 2)))
+
 
 def test_lpp_transform():
     # just a smoketest
@@ -30,3 +36,15 @@ def test_line_plus_outlier():
 
     ratio = Xlpp[1:, 0] / X[1:, 0]
     assert_allclose(ratio, ratio[0])
+
+
+def test_weights():
+    X, y = make_blobs(100, n_features=3)
+
+    # with large enough weights, results should be equivalent to adjacency
+    lpp1 = LocalityPreservingProjection(n_components=2, weight='adjacency')
+    lpp2 = LocalityPreservingProjection(n_components=2, weight='heat',
+                                        weight_width=1E6)
+
+    assert_allclose(lpp1.fit_transform(X),
+                    lpp2.fit_transform(X))
