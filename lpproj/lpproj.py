@@ -101,7 +101,9 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
         return W
 
 
-def eigh_robust(a, b=None, **kwargs):
+def eigh_robust(a, b=None, eigvals=None, eigvals_only=False,
+                overwrite_a=False, overwrite_b=False,
+                turbo=True, check_finite=True):
     """Robustly solve the Hermitian generalized eigenvalue problem
 
     This function robustly solves the Hermetian generalized eigenvalue problem
@@ -117,8 +119,24 @@ def eigh_robust(a, b=None, **kwargs):
     b : (M, M) array_like, optional
         A complex Hermitian or real symmetric matrix.
         If omitted, identity matrix is assumed.
-    **kwargs :
-        Additional keywords are passed to ``scipy.linalg.eigh()``.
+    eigvals : tuple (lo, hi), optional
+        Indexes of the smallest and largest (in ascending order) eigenvalues
+        and corresponding eigenvectors to be returned: 0 <= lo <= hi <= M-1.
+        If omitted, all eigenvalues and eigenvectors are returned.
+    eigvals_only : bool, optional
+        Whether to calculate only eigenvalues and no eigenvectors.
+        (Default: both are calculated)
+    turbo : bool, optional
+        Use divide and conquer algorithm (faster but expensive in memory,
+        only for generalized eigenvalue problem and if eigvals=None)
+    overwrite_a : bool, optional
+        Whether to overwrite data in `a` (may improve performance)
+    overwrite_b : bool, optional
+        Whether to overwrite data in `b` (may improve performance)
+    check_finite : bool, optional
+        Whether to check that the input matrices contain only finite numbers.
+        Disabling may give a performance gain, but may result in problems
+        (crashes, non-termination) if the inputs do contain infinities or NaNs.
 
     Returns
     -------
@@ -128,27 +146,27 @@ def eigh_robust(a, b=None, **kwargs):
     v : (M, N) complex ndarray
         (if eigvals_only == False)
     """
+    kwargs = dict(eigvals=eigvals, eigvals_only=eigvals_only,
+                  turbo=turbo, check_finite=check_finite,
+                  overwrite_a=overwrite_a, overwrite_b=overwrite_b)
+
+    # Check for easy case first:
     if b is None:
-        return linalg.eigh(a, b, **kwargs)
-    if kwargs.get('type', 1) != 1:
-        raise ValueError("Only type=1 generalized eigenvalue problems "
-                         "are supported")
+        return linalg.eigh(a, **kwargs)
 
     # Compute eigendecomposition of b
-    kwargs_b = dict(kwargs)
-    kwargs_b['eigvals_only'] = False
-    kwargs_b['eigvals'] = None
-    kwargs_b['overwrite_a'] = kwargs.get('overwrite_b', False)
+    kwargs_b = dict(turbo=turbo, check_finite=check_finite,
+                    overwrite_a=overwrite_b)  # b is a for this operation
     S, U = linalg.eigh(b, **kwargs_b)
 
-    # Combine a and b on left-hand-side
+    # Combine a and b on left hand side via decomposition of b
     S[S <= 0] = np.inf
     Sinv = 1. / np.sqrt(S)
     W = Sinv[:, None] * np.dot(U.T, np.dot(a, U)) * Sinv
     output = linalg.eigh(W, **kwargs)
 
-    if not kwargs.get('eigvals_only'):
+    if eigvals_only:
+        return output
+    else:
         evals, evecs = output
-        output = (evals, np.dot(U, Sinv[:, None] * evecs))
-
-    return output
+        return evals, np.dot(U, Sinv[:, None] * evecs)
