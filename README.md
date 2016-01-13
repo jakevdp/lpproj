@@ -7,7 +7,7 @@ This is a Python implementation of Locality Preserving Projections (LPP), compat
 [![build status](http://img.shields.io/travis/jakevdp/lpproj/master.svg?style=flat)](https://travis-ci.org/jakevdp/lpproj)
 [![license](http://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://github.com/jakevdp/lpproj/blob/master/LICENSE)
 
-## Installing and Using
+## Installation and Use
 
 This package is pure Python, and depends only on [numpy](http://numpy.org/), [scipy](http://scipy.org/), and [scikit-learn](http://scikit-learn.org/).
 The released version can be installed via pip:
