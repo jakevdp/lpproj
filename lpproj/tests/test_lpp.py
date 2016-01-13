@@ -5,6 +5,12 @@ from sklearn.datasets import make_blobs
 from .. import LocalityPreservingProjection
 
 
+def test_estimator_checks():
+    """Run scikit-learn's suite of basic estimator checks"""
+    from sklearn.utils.estimator_checks import check_estimator
+    check_estimator(LocalityPreservingProjection)
+
+
 def test_bad_weights():
     lpp = LocalityPreservingProjection(weight='bad_argument')
     assert_raises(ValueError, lpp.fit, np.zeros((10, 2)))
