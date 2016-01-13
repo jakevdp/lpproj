@@ -7,6 +7,15 @@ This is a Python implementation of Locality Preserving Projections (LPP), compat
 [![build status](http://img.shields.io/travis/jakevdp/lpproj/master.svg?style=flat)](https://travis-ci.org/jakevdp/lpproj)
 [![license](http://img.shields.io/badge/license-BSD-blue.svg?style=flat)](https://github.com/jakevdp/lpproj/blob/master/LICENSE)
 
-A basic example can be found in [Example.ipynb](Example.ipynb).
+## Installing and Using
 
-For information on the LPP algorithm, see the paper: [(pdf)](http://papers.nips.cc/paper/2359-locality-preserving-projections.pdf)
+This package is pure Python, and depends only on [numpy](http://numpy.org/), [scipy](http://scipy.org/), and [scikit-learn](http://scikit-learn.org/).
+The released version can be installed via pip:
+
+    $ pip install lpproj
+
+A basic example of its use can be found in [Example.ipynb](Example.ipynb).
+
+## More Information
+
+For information on the LPP algorithm, see the paper, [Locality Preserving Projections (pdf)](http://papers.nips.cc/paper/2359-locality-preserving-projections.pdf).
