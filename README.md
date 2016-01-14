@@ -14,7 +14,15 @@ The released version can be installed via pip:
 
     $ pip install lpproj
 
-A basic example of its use can be found in [Example.ipynb](Example.ipynb).
+A basic example of its use can be found in [Example.ipynb](Example.ipynb); the library follows scikit-learn's patterns for *fit()*, *transform()*, and *fit_transform()*. The simplest example for a feature matrix X:
+
+'''python
+from lpproj import LocalityPreservingProjection 
+lpp = LocalityPreservingProjection(n_components=2)
+
+X_2D = lpp.fit_transform(X)
+
+'''
 
 ## More Information
 
