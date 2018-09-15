@@ -17,7 +17,7 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
     n_neighbors : integer
         number of neighbors to consider for each point.
 
-    weight : string ['adjacency'|'heat']
+    weight : string ['adjacency'|'heat'|'precomputed']
         Weight function to use for the mapping
 
     weight_width : float
@@ -37,7 +37,6 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
                  weight='adjacency', weight_width=1.0,
                  neighbors_algorithm='auto'):
         # TODO: allow radius neighbors
-        # TODO: allow for precomputed weights
         self.n_components = n_components
         self.n_neighbors = n_neighbors
         self.weight = weight
@@ -81,6 +80,14 @@ class LocalityPreservingProjection(BaseEstimator, TransformerMixin):
 
     def _compute_weights(self, X):
         X = check_array(X)
+
+        if self.weight == 'precomputed':
+            if X.shape[0] != X.shape[1]:
+                raise ValueError("Input is not square matrix despite weight "
+                                 "is precomputed")
+            X = np.maximum(X, X.T)
+            return X
+
         self.nbrs_ = NearestNeighbors(n_neighbors=self.n_neighbors,
                                       algorithm=self.neighbors_algorithm)
         self.nbrs_.fit(X)
